@@ -17,6 +17,15 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('role' , ['admin', 'teacher', 'student']);
+            $table->string('phone')->nullable()->unique();
+            $table->string('avatar')->nullable();
+            $table->enum('gender', ['male', 'female', 'other'])->nullable();
+            $table->year('year_of_birth')->nullable();
+            $table->string('country')->nullable();
+            $table->string('city')->nullable();
+            $table->string('timezone')->default('UTC');
+            $table->enum('status' , ['active' , 'deactive' , 'ban' , 'suspended' , 'pending'])->default('pending');
             $table->rememberToken();
             $table->timestamps();
         });
