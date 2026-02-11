@@ -18,7 +18,7 @@ return new class extends Migration
 
             $table->string('title');
             $table->text('body')->nullable();
-            $table->string('link')->nullable(); // e.g. /courses/5 or /assignments/10
+            $table->string('link')->nullable(); 
 
             $table->timestamp('read_at')->nullable();
 
