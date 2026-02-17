@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Hekmatinasser\Verta\Verta;
 
 class Course extends Model
 {
@@ -140,6 +141,29 @@ class Course extends Model
             ->count();
         
         return max(0, $this->capacity_max - $enrolled);
+    }
+
+    // Date formatting accessors
+
+    public function getStartDateJalaliAttribute(): ?string
+    {
+        return $this->start_date
+            ? Verta::instance($this->start_date)->format('Y/m/d')
+            : null;
+    }
+
+    public function getEndDateJalaliAttribute(): ?string
+    {
+        return $this->end_date
+            ? Verta::instance($this->end_date)->format('Y/m/d')
+            : null;
+    }
+
+    public function getRegistrationDeadlineJalaliAttribute(): ?string
+    {
+        return $this->registration_deadline
+            ? Verta::instance($this->registration_deadline)->format('Y/m/d')
+            : null;
     }
 
 }

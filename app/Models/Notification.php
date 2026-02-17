@@ -28,26 +28,13 @@ class Notification extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'notification_user');
+        return $this->belongsToMany(User::class, 'notification_user')
+            ->withPivot('read_at')
+            ->withTimestamps();
     }
+
 
     // Helper Methods
-
-    /**
-     * Check if notification is read
-     */
-    public function isRead(): bool
-    {
-        return $this->read_at !== null;
-    }
-
-    /**
-     * Check if notification is unread
-     */
-    public function isUnread(): bool
-    {
-        return $this->read_at === null;
-    }
 
     /**
      * Mark notification as read
