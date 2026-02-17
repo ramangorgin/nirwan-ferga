@@ -57,12 +57,12 @@ class CourseUpdateRequest extends FormRequest
 
             'registration_deadline' => ['sometimes', 'date'],
             'start_date' => ['sometimes', 'date'],
-            'end_date' => ['sometimes', 'date', 'after_or_equal:start_date'],
+            'end_date' => ['sometimes', 'date'],
 
             'days_of_week' => ['sometimes', 'array'],
             'days_of_week.*' => ['in:monday,tuesday,wednesday,thursday,friday,saturday,sunday'],
 
-            'start_time' => ['sometimes'],
+            'start_time' => ['sometimes', 'date_format:H:i'],
             'session_duration' => ['sometimes', 'integer', 'min:1'],
             'sessions_count' => ['sometimes', 'integer', 'min:1'],
 

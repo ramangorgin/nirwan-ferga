@@ -88,7 +88,7 @@ class Enrollment extends Model
      */
     public function isRejected(): bool
     {
-        return $this->payment_status === 'rejected';
+        return $this->status === 'rejected';
     }
 
     /**

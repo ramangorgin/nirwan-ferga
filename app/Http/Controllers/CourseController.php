@@ -9,6 +9,8 @@ use App\Http\Requests\CourseUpdateRequest;
 use App\Models\Course;
 use App\Services\Courses\CourseService;
 use App\Models\User;
+use App\Models\Enrollment;
+use App\Http\Requests\EnrollmentStoreRequest;
 
 
 class CourseController extends Controller
@@ -167,4 +169,44 @@ class CourseController extends Controller
             ->route('courses.index')
             ->with('success', 'دوره با موفقیت لغو گشت.');
     }
+
+
+    // Student self-enroll related method
+    public function enroll(EnrollmentStoreRequest $request, Course $course)
+    {
+        $this->authorize('create', Enrollment::class);
+
+        $data = $request->validated();
+
+        if (! $course->isRegistrationOpen()) {
+            abort(403);
+        }
+
+        if ($course->isFull()) {
+            abort(422);
+        }
+
+        $exists = Enrollment::where('course_id', $course->id)
+            ->where('student_id', auth()->id())
+            ->exists();
+
+        if ($exists) {
+            abort(422);
+        }
+
+        $path = $request->file('payment_screenshot')
+            ->store('enrollment_screenshots', 'public');
+
+        Enrollment::create([
+            'course_id' => $course->id,
+            'student_id' => auth()->id(),
+            'status' => 'pending',
+            'payment_status' => 'unpaid',
+            'paid_amount' => 0,
+            'payment_screenshot_path' => $path,
+        ]);
+
+        return back()->with('success', 'درخواست ثبت‌نام ارسال شد. لطفاً منتظر تایید باشید.');
+    }
+
 }

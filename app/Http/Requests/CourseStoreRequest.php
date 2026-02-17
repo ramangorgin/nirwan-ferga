@@ -59,7 +59,7 @@ class CourseStoreRequest extends FormRequest
             'days_of_week' => ['required', 'array'],
             'days_of_week.*' => ['in:monday,tuesday,wednesday,thursday,friday,saturday,sunday'],
 
-            'start_time' => ['required'],
+            'start_time' => ['required', 'date_format:H:i'],
             'session_duration' => ['required', 'integer', 'min:1'],
             'sessions_count' => ['required', 'integer', 'min:1'],
 

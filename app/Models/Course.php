@@ -85,7 +85,9 @@ class Course extends Model
      */
     public function isRegistrationOpen(): bool
     {
-        return $this->registration_deadline > now() && $this->status === 'registration_open';
+        return $this->registration_deadline > now() 
+            && $this->status === 'registration_open' 
+            && $this->is_active;
     }
 
     /**
@@ -93,7 +95,9 @@ class Course extends Model
      */
     public function isFull(): bool
     {
-        return $this->enrollments()->where('status', '!=', 'rejected')->where('status', '!=', 'cancelled')->count() >= $this->capacity_max;
+        return $this->enrollments()
+            ->whereIn('status', ['confirmed', 'completed'])
+            ->count() >= $this->capacity_max;
     }
 
     /**

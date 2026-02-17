@@ -10,14 +10,11 @@ class CoursePolicy
 {
     public function viewAny(User $user): bool
     {
-        // Adjust later if students can see only active/open courses
         return in_array($user->role, ['admin', 'teacher', 'student']);
     }
 
     public function view(User $user, Course $course): bool
     {
-        // For now: anyone logged in can view.
-        // Later you can restrict students based on is_active/status/enrollment.
         return in_array($user->role, ['admin', 'teacher', 'student']);
     }
 
