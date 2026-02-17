@@ -5,6 +5,7 @@ namespace App\Services\Enrollments;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Services\Notifications\NotificationService;
+use App\Services\Sms\SmsService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -12,9 +13,19 @@ class EnrollmentService
 {
     public function __construct(
         protected NotificationService $notificationService,
-        protected SmsService $smsService, 
+        protected SmsService $smsService
     ) {}
 
+    /**
+     * Manually enroll a student in a course
+     * 
+     * @param Course $course Course to enroll in
+     * @param int $studentId Student user ID
+     * @param int $actorUserId User ID performing the action
+     * @param int|null $paidAmount Amount paid (defaults to course price)
+     * @return Enrollment
+     * @throws ValidationException
+     */
     public function manualEnroll(Course $course, int $studentId, int $actorUserId, ?int $paidAmount = null): Enrollment
     {
         return DB::transaction(function () use ($course, $studentId, $actorUserId, $paidAmount) {
@@ -58,6 +69,15 @@ class EnrollmentService
         });
     }
 
+    /**
+     * Verify or update enrollment status and payment
+     * 
+     * @param Enrollment $enrollment Enrollment to update
+     * @param array $data Updated data
+     * @param int $actorUserId User ID performing the action
+     * @return Enrollment
+     * @throws ValidationException
+     */
     public function verifyOrUpdate(Enrollment $enrollment, array $data, int $actorUserId): Enrollment
     {
         return DB::transaction(function () use ($enrollment, $data, $actorUserId) {
@@ -68,7 +88,7 @@ class EnrollmentService
 
             if ($newStatus === 'confirmed' && $newPayment !== 'paid') {
                 throw ValidationException::withMessages([
-                    'status' => 'Cannot confirm enrollment unless payment_status is paid.'
+                    'status' => 'نمی‌توان ثبت‌نام را تایید کرد مگر اینکه وضعیت پرداخت "پرداخت شده" باشد.'
                 ]);
             }
 
@@ -96,6 +116,13 @@ class EnrollmentService
         });
     }
 
+    /**
+     * Cancel an enrollment
+     * 
+     * @param Enrollment $enrollment Enrollment to cancel
+     * @param int $actorUserId User ID performing the action
+     * @return Enrollment
+     */
     public function cancel(Enrollment $enrollment, int $actorUserId): Enrollment
     {
         return DB::transaction(function () use ($enrollment, $actorUserId) {
