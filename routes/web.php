@@ -7,6 +7,8 @@ use App\Http\Controllers\ClassSessionController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\DiscountCodeController;
 use App\Http\Controllers\SessionMaterialController;
+use App\Http\Controllers\AttendanceController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -81,6 +83,14 @@ Route::middleware(['auth'])->group(function () {
 
     Route::delete('session-materials/{sessionMaterial}', [SessionMaterialController::class, 'destroy'])
         ->name('session-materials.destroy');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Attendances
+    |--------------------------------------------------------------------------
+    */
+    Route::post('class-sessions/{class_session}/attendances', [AttendanceController::class, 'upsert'])
+    ->name('class-sessions.attendances.upsert');
 });
 
 require __DIR__.'/auth.php';
