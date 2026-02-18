@@ -10,6 +10,9 @@ use App\Http\Controllers\SessionMaterialController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\SubmissionController;
+use App\Http\Controllers\QuizController;
+use App\Http\Controllers\QuizQuestionController;
+use App\Http\Controllers\StudentQuizController;
 
 
 /*
@@ -114,7 +117,7 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Assignments
+    | Assignments & Submissions
     |--------------------------------------------------------------------------
     */
     Route::post('assignments/{assignment}/submissions', [SubmissionController::class, 'store'])
@@ -128,6 +131,37 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('class-sessions/{class_session}/submissions', [SubmissionController::class, 'indexSession'])
         ->name('class-sessions.submissions.index');
+
 });
 
-require __DIR__.'/auth.php';
+/*
+|--------------------------------------------------------------------------
+| Quizzes & Submissions
+|--------------------------------------------------------------------------
+*/ 
+Route::middleware(['auth'])->group(function () {
+
+    // Admin/Teacher Quiz CRUD (4 blades: index/create/edit/show)
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::resource('quizzes', QuizController::class);
+
+        // Questions management (created/edited from quiz show/edit pages)
+        Route::post('quizzes/{quiz}/questions', [QuizQuestionController::class, 'store'])
+            ->name('quizzes.questions.store');
+
+        Route::patch('quiz-questions/{question}', [QuizQuestionController::class, 'update'])
+            ->name('quiz-questions.update');
+
+        Route::delete('quiz-questions/{question}', [QuizQuestionController::class, 'destroy'])
+            ->name('quiz-questions.destroy');
+    });
+
+    // Student quiz pages
+    Route::prefix('student')->name('student.')->group(function () {
+        Route::get('quizzes', [StudentQuizController::class, 'index'])->name('quizzes.index');
+        Route::get('quizzes/{quiz}', [StudentQuizController::class, 'show'])->name('quizzes.show');
+        Route::post('quizzes/{quiz}/submit', [StudentQuizController::class, 'submit'])->name('quizzes.submit');
+        Route::get('quizzes/{quiz}/result', [StudentQuizController::class, 'result'])->name('quizzes.result');
+    });
+
+});
