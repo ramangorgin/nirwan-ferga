@@ -8,6 +8,8 @@ use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\DiscountCodeController;
 use App\Http\Controllers\SessionMaterialController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\SubmissionController;
 
 
 /*
@@ -91,6 +93,41 @@ Route::middleware(['auth'])->group(function () {
     */
     Route::post('class-sessions/{class_session}/attendances', [AttendanceController::class, 'upsert'])
     ->name('class-sessions.attendances.upsert');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Assignments
+    |--------------------------------------------------------------------------
+    */
+    Route::post('class-sessions/{class_session}/assignments', [AssignmentController::class, 'store'])
+    ->name('class-sessions.assignments.store');
+
+    Route::patch('assignments/{assignment}', [AssignmentController::class, 'update'])
+        ->name('assignments.update');
+
+    Route::delete('assignments/{assignment}', [AssignmentController::class, 'destroy'])
+        ->name('assignments.destroy');
+
+    // personalized 
+    Route::post('assignments/{assignment}/personalizations', [AssignmentController::class, 'upsertPersonalizations'])
+        ->name('assignments.personalizations.upsert');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Assignments
+    |--------------------------------------------------------------------------
+    */
+    Route::post('assignments/{assignment}/submissions', [SubmissionController::class, 'store'])
+    ->name('assignments.submissions.store');
+
+    Route::patch('submissions/{submission}/grade', [SubmissionController::class, 'grade'])
+    ->name('submissions.grade');
+
+    Route::post('assignments/{assignment}/submissions', [SubmissionController::class, 'store'])
+    ->name('assignments.submissions.store');
+
+    Route::get('class-sessions/{class_session}/submissions', [SubmissionController::class, 'indexSession'])
+        ->name('class-sessions.submissions.index');
 });
 
 require __DIR__.'/auth.php';
