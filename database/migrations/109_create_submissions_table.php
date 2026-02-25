@@ -28,7 +28,7 @@ return new class extends Migration
             $table->dateTime('graded_at')->nullable();
 
             // Grading
-            $table->foreignId('graded_by')->constrained('users')->restrictOnDelete()->nullable();
+            $table->foreignId('graded_by')->nullable()->constrained('users')->restrictOnDelete();
             $table->boolean('auto_graded')->default(false);
             $table->unsignedInteger('score_obtained')->nullable();            
             $table->unsignedInteger('max_score_cached')->nullable();

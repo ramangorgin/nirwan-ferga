@@ -37,6 +37,7 @@ class Submission extends Model
         'submitted_at' => 'datetime',
         'graded_at' => 'datetime',
         'answer_json' => 'array',
+        'enrollment_id' => 'integer',
     ];
 
     public function assignment()

@@ -6,25 +6,25 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable;
 
-    protected $fillable = [
+protected $fillable = [
         'name',
         'email',
         'password',
         'role',
         'phone',
         'avatar',
-        'status',
         'gender',
-        'year_of_birth',
+        'birthdate',
         'country',
         'city',
-        'timezone'
+        'timezone',
+        'status',
     ];
 
     protected $hidden = [
@@ -34,18 +34,27 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'phone_verified_at' => 'datetime',  
+        'birthdate' => 'date',
+        'role' => 'string',
+        'gender' => 'string',
+        'timezone' => 'string',
         'status' => 'string',
     ];
 
+    /**
+     * Hash password automatically if needed.
+     */
     public function setPasswordAttribute($value)
     {
-        if (! Hash::needsRehash($value)) {
+        if (!Hash::needsRehash($value)) {
             $this->attributes['password'] = $value;
             return;
         }
 
         $this->attributes['password'] = Hash::make($value);
     }
+
 
     public function teachingCourses()
     {
@@ -90,13 +99,6 @@ class User extends Authenticatable
     public function posts()
     {
         return $this->hasMany(Post::class);
-    }
-
-    public function notifications()
-    {
-        return $this->belongsToMany(Notification::class, 'notification_user')
-            ->withPivot('read_at')
-            ->withTimestamps();
     }
     
     public function studentConversations()
@@ -147,6 +149,27 @@ class User extends Authenticatable
     public function reviewedPayments()
     {
         return $this->hasMany(Payment::class, 'reviewed_by');
+    }
+
+     // ---- Relations ----
+    public function notifications()
+    {
+        return $this->belongsToMany(\App\Models\Notification::class, 'notification_user')
+            ->withPivot('read_at')
+            ->withTimestamps();
+    }
+
+    // ---- Helpers ----
+    public function isAdmin(): bool { return $this->role === 'admin'; }
+    public function isTeacher(): bool { return $this->role === 'teacher'; }
+    public function isStudent(): bool { return $this->role === 'student'; }
+
+    public function isActive(): bool { return $this->status === 'active'; }
+    public function isBanned(): bool { return $this->status === 'ban'; }
+
+    public function hasVerifiedPhone(): bool
+    {
+        return $this->phone_verified_at !== null;
     }
 
 }

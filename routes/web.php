@@ -10,22 +10,37 @@ use App\Http\Controllers\SessionMaterialController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\SubmissionController;
+
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizQuestionController;
 use App\Http\Controllers\StudentQuizController;
+
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\MessageController;
+
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TicketMessageController;
+
 use App\Http\Controllers\AdminAnnouncementController;
 use App\Http\Controllers\AnnouncementPublicController;
+
 use App\Http\Controllers\AdminPostController;
 use App\Http\Controllers\PostPublicController;
+
 use App\Http\Controllers\NotificationController;
+
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AdminPaymentController;
 
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\Auth\PhoneVerificationController;
 
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminUserController;
+
+use App\Http\Controllers\Auth\PasswordResetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,50 +49,98 @@ use App\Http\Controllers\AdminPaymentController;
 */
 
 Route::get('/', function () {
-    return redirect()->route('home');
+    return view('home');
+})->name('home');
+
+/*
+|--------------------------------------------------------------------------
+| Public (Guest allowed)
+|--------------------------------------------------------------------------
+*/
+
+// Public announcements
+Route::get('/announcements', [AnnouncementPublicController::class, 'index'])
+    ->name('announcements.public.index');
+
+Route::get('/announcements/{announcement}', [AnnouncementPublicController::class, 'show'])
+    ->name('announcements.public.show');
+
+// Public blog
+Route::get('/blog', [PostPublicController::class, 'index'])->name('posts.index');
+Route::get('/blog/{post:slug}', [PostPublicController::class, 'show'])->name('posts.show');
+
+/*
+|--------------------------------------------------------------------------
+| Auth (Guest only)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('guest')->group(function () {
+    Route::get('/register', [RegisterController::class, 'create'])->name('register');
+    Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
+
+    Route::get('/login', [LoginController::class, 'create'])->name('login');
+    Route::post('/login', [LoginController::class, 'store'])->name('login.store');
+
+    Route::get('/forgot-password', [PasswordResetController::class, 'create'])
+        ->name('password.request');
+
+    Route::post('/forgot-password', [PasswordResetController::class, 'store'])
+        ->name('password.email');
+
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'edit'])
+        ->name('password.reset');
+
+    Route::post('/reset-password', [PasswordResetController::class, 'update'])
+        ->name('password.update');
 });
 
-Route::middleware(['auth'])->group(function () {
+/*
+|--------------------------------------------------------------------------
+| Authenticated Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+
+    Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+
+    // Email verification
+    Route::get('/email/verify', [EmailVerificationController::class, 'notice'])
+        ->name('verification.notice');
+
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+        ->middleware('signed')
+        ->name('verification.verify');
+
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'send'])
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
+
+    // Phone verification (OTP)
+    Route::get('/phone/verify', [PhoneVerificationController::class, 'notice'])->name('phone.verify.notice');
+    Route::post('/phone/verify/send', [PhoneVerificationController::class, 'sendCode'])->name('phone.verify.send');
+    Route::post('/phone/verify/check', [PhoneVerificationController::class, 'verifyCode'])->name('phone.verify.check');
+
+    // Profile
+    Route::get('/my/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/my/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     /*
     |--------------------------------------------------------------------------
-    | Courses
+    | Courses / Sessions / Enrollments
     |--------------------------------------------------------------------------
     */
     Route::resource('courses', CourseController::class);
+    Route::post('courses/{course}/enroll', [CourseController::class, 'enroll'])->name('courses.enroll');
 
-    // CourseController@enroll(EnrollmentStoreRequest $request, Course $course)
-    Route::post('courses/{course}/enroll', [CourseController::class, 'enroll'])
-        ->name('courses.enroll');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Class Sessions
-    |--------------------------------------------------------------------------
-    */
     Route::resource('class-sessions', ClassSessionController::class);
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Enrollments
-    |--------------------------------------------------------------------------
-    */
     Route::resource('enrollments', EnrollmentController::class);
-
-    // EnrollmentController@createManual()
-    Route::get('enrollments/manual/create', [EnrollmentController::class, 'createManual'])
-        ->name('enrollments.manual.create');
-
-    // EnrollmentController@storeManual(EnrollmentManualStoreRequest $request)
-    Route::post('enrollments/manual', [EnrollmentController::class, 'storeManual'])
-        ->name('enrollments.manual.store');
-
+    Route::get('enrollments/manual/create', [EnrollmentController::class, 'createManual'])->name('enrollments.manual.create');
+    Route::post('enrollments/manual', [EnrollmentController::class, 'storeManual'])->name('enrollments.manual.store');
 
     /*
     |--------------------------------------------------------------------------
-    | Discount Codes (JSON)
+    | Discount Codes
     |--------------------------------------------------------------------------
     */
     Route::post('discount-codes/validate', [DiscountCodeController::class, 'validateCode'])
@@ -85,7 +148,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('discount-codes', DiscountCodeController::class)
         ->parameters(['discount-codes' => 'discount_code']);
-
 
     /*
     |--------------------------------------------------------------------------
@@ -107,15 +169,15 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::post('class-sessions/{class_session}/attendances', [AttendanceController::class, 'upsert'])
-    ->name('class-sessions.attendances.upsert');
+        ->name('class-sessions.attendances.upsert');
 
     /*
     |--------------------------------------------------------------------------
-    | Assignments
+    | Assignments / Submissions
     |--------------------------------------------------------------------------
     */
     Route::post('class-sessions/{class_session}/assignments', [AssignmentController::class, 'store'])
-    ->name('class-sessions.assignments.store');
+        ->name('class-sessions.assignments.store');
 
     Route::patch('assignments/{assignment}', [AssignmentController::class, 'update'])
         ->name('assignments.update');
@@ -123,155 +185,125 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('assignments/{assignment}', [AssignmentController::class, 'destroy'])
         ->name('assignments.destroy');
 
-    // personalized 
     Route::post('assignments/{assignment}/personalizations', [AssignmentController::class, 'upsertPersonalizations'])
         ->name('assignments.personalizations.upsert');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Assignments & Submissions
-    |--------------------------------------------------------------------------
-    */
     Route::post('assignments/{assignment}/submissions', [SubmissionController::class, 'store'])
-    ->name('assignments.submissions.store');
+        ->name('assignments.submissions.store');
 
     Route::patch('submissions/{submission}/grade', [SubmissionController::class, 'grade'])
-    ->name('submissions.grade');
-
-    Route::post('assignments/{assignment}/submissions', [SubmissionController::class, 'store'])
-    ->name('assignments.submissions.store');
+        ->name('submissions.grade');
 
     Route::get('class-sessions/{class_session}/submissions', [SubmissionController::class, 'indexSession'])
         ->name('class-sessions.submissions.index');
 
-});
+    /*
+    |--------------------------------------------------------------------------
+    | Student announcements panel
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/my/announcements', [AnnouncementPublicController::class, 'my'])
+        ->name('announcements.student.index');
 
-/*
-|--------------------------------------------------------------------------
-| Quizzes & Submissions
-|--------------------------------------------------------------------------
-*/ 
-Route::middleware(['auth'])->group(function () {
+    Route::get('/my/announcements/{announcement}', [AnnouncementPublicController::class, 'myShow'])
+        ->name('announcements.student.show');
 
-    // Admin/Teacher Quiz CRUD (4 blades: index/create/edit/show)
-    Route::prefix('admin')->name('admin.')->group(function () {
-        Route::resource('quizzes', QuizController::class);
-
-        // Questions management (created/edited from quiz show/edit pages)
-        Route::post('quizzes/{quiz}/questions', [QuizQuestionController::class, 'store'])
-            ->name('quizzes.questions.store');
-
-        Route::patch('quiz-questions/{question}', [QuizQuestionController::class, 'update'])
-            ->name('quiz-questions.update');
-
-        Route::delete('quiz-questions/{question}', [QuizQuestionController::class, 'destroy'])
-            ->name('quiz-questions.destroy');
-    });
-
-    // Student quiz pages
-    Route::prefix('student')->name('student.')->group(function () {
-        Route::get('quizzes', [StudentQuizController::class, 'index'])->name('quizzes.index');
-        Route::get('quizzes/{quiz}', [StudentQuizController::class, 'show'])->name('quizzes.show');
-        Route::post('quizzes/{quiz}/submit', [StudentQuizController::class, 'submit'])->name('quizzes.submit');
-        Route::get('quizzes/{quiz}/result', [StudentQuizController::class, 'result'])->name('quizzes.result');
-    });
-
-});
-
-Route::middleware(['auth'])->group(function () {
-
-    Route::get('/conversations', [ConversationController::class, 'index'])
-        ->name('conversations.index');
-
-    Route::post('/conversations', [ConversationController::class, 'store'])
-        ->name('conversations.store');
-
-    Route::get('/conversations/{conversation}', [ConversationController::class, 'show'])
-        ->name('conversations.show');
+    /*
+    |--------------------------------------------------------------------------
+    | Conversations (DM)
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/conversations', [ConversationController::class, 'index'])->name('conversations.index');
+    Route::post('/conversations', [ConversationController::class, 'store'])->name('conversations.store');
+    Route::get('/conversations/{conversation}', [ConversationController::class, 'show'])->name('conversations.show');
 
     Route::post('/conversations/{conversation}/messages', [MessageController::class, 'store'])
         ->name('conversations.messages.store');
 
     Route::post('/conversations/{conversation}/read', [MessageController::class, 'markRead'])
         ->name('conversations.read');
-});
 
-Route::middleware(['auth'])->group(function () {
-
-    // Tickets basic
+    /*
+    |--------------------------------------------------------------------------
+    | Tickets
+    |--------------------------------------------------------------------------
+    */
     Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
     Route::get('/tickets/create', [TicketController::class, 'create'])->name('tickets.create');
     Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store');
     Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
 
-    // Messages inside ticket
     Route::post('/tickets/{ticket}/messages', [TicketMessageController::class, 'store'])
         ->name('tickets.messages.store');
 
-    // Admin update + close
     Route::patch('/tickets/{ticket}/admin-update', [TicketController::class, 'adminUpdate'])
         ->name('tickets.adminUpdate');
 
     Route::post('/tickets/{ticket}/close', [TicketController::class, 'close'])
         ->name('tickets.close');
-});
 
-// Public (guest allowed)
-Route::get('/announcements', [AnnouncementPublicController::class, 'index'])
-    ->name('announcements.public.index');
+    /*
+    |--------------------------------------------------------------------------
+    | Notifications UI
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+    Route::post('/notifications/{notification}/unread', [NotificationController::class, 'markUnread'])->name('notifications.unread');
+    Route::post('/notifications/bulk-read', [NotificationController::class, 'bulkRead'])->name('notifications.bulkRead');
 
-Route::get('/announcements/{announcement}', [AnnouncementPublicController::class, 'show'])
-    ->name('announcements.public.show');
-
-// Student panel (auth)
-Route::middleware(['auth'])->group(function () {
-    Route::get('/my/announcements', [AnnouncementPublicController::class, 'my'])
-        ->name('announcements.student.index');
-
-    Route::get('/my/announcements/{announcement}', [AnnouncementPublicController::class, 'myShow'])
-        ->name('announcements.student.show');
-});
-
-// Admin/Teacher (auth + you may have role middleware)
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('announcements', AdminAnnouncementController::class);
-});
-
-// Public blog
-Route::get('/blog', [PostPublicController::class, 'index'])->name('posts.index');
-Route::get('/blog/{post:slug}', [PostPublicController::class, 'show'])->name('posts.show');
-
-// Admin
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('posts', AdminPostController::class);
-});
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/notifications', [NotificationController::class, 'index'])
-        ->name('notifications.index');
-
-    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])
-        ->name('notifications.read');
-
-    Route::post('/notifications/{notification}/unread', [NotificationController::class, 'markUnread'])
-        ->name('notifications.unread');
-
-    Route::post('/notifications/bulk-read', [NotificationController::class, 'bulkRead'])
-        ->name('notifications.bulkRead');
-});
-
-
-Route::middleware(['auth'])->group(function () {
-
-    // Student
+    /*
+    |--------------------------------------------------------------------------
+    | Payments (student)
+    |--------------------------------------------------------------------------
+    */
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
     Route::get('/enrollments/{enrollment}/payments/create', [PaymentController::class, 'create'])->name('payments.create');
     Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
 
-    // Admin
-    Route::prefix('admin')->name('admin.')->group(function () {
-        Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');
-        Route::get('/payments/{payment}', [AdminPaymentController::class, 'show'])->name('payments.show');
-        Route::post('/payments/{payment}/review', [AdminPaymentController::class, 'review'])->name('payments.review');
+    /*
+    |--------------------------------------------------------------------------
+    | Quizzes (student)
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('student')->name('student.')->group(function () {
+        Route::get('quizzes', [StudentQuizController::class, 'index'])->name('quizzes.index');
+        Route::get('quizzes/{quiz}', [StudentQuizController::class, 'show'])->name('quizzes.show');
+        Route::post('quizzes/{quiz}/submit', [StudentQuizController::class, 'submit'])->name('quizzes.submit');
+        Route::get('quizzes/{quiz}/result', [StudentQuizController::class, 'result'])->name('quizzes.result');
     });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Admin Panel (auth required)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+
+    // Users
+    Route::resource('users', AdminUserController::class);
+
+    // Announcements
+    Route::resource('announcements', AdminAnnouncementController::class);
+
+    // Posts
+    Route::resource('posts', AdminPostController::class);
+
+    // Payments (admin) - IMPORTANT: unique route names
+    Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');
+    Route::get('/payments/{payment}', [AdminPaymentController::class, 'show'])->name('payments.show');
+    Route::post('/payments/{payment}/review', [AdminPaymentController::class, 'review'])->name('payments.review');
+
+    // Quizzes (admin/teacher CRUD)
+    Route::resource('quizzes', QuizController::class);
+
+    Route::post('quizzes/{quiz}/questions', [QuizQuestionController::class, 'store'])
+        ->name('quizzes.questions.store');
+
+    Route::patch('quiz-questions/{question}', [QuizQuestionController::class, 'update'])
+        ->name('quiz-questions.update');
+
+    Route::delete('quiz-questions/{question}', [QuizQuestionController::class, 'destroy'])
+        ->name('quiz-questions.destroy');
 });

@@ -19,9 +19,10 @@ return new class extends Migration
             $table->string('password');
             $table->enum('role' , ['admin', 'teacher', 'student']);
             $table->string('phone')->nullable()->unique();
+            $table->timestamp('phone_verified_at')->nullable();
             $table->string('avatar')->nullable();
             $table->enum('gender', ['male', 'female', 'other'])->nullable();
-            $table->year('year_of_birth')->nullable();
+            $table->date('birthdate')->nullable();
             $table->string('country')->nullable();
             $table->string('city')->nullable();
             $table->string('timezone')->default('UTC');
