@@ -17,12 +17,13 @@ class Payment extends Model
         'status',
         'admin_note',
         'reviewed_by',
-        'reviewed_at'
+        'reviewed_at',
     ];
 
     protected $casts = [
         'amount' => 'integer',
         'reviewed_at' => 'datetime',
+        'status' => 'string',
     ];
 
     public function enrollment()
@@ -35,60 +36,18 @@ class Payment extends Model
         return $this->belongsTo(User::class, 'student_id');
     }
 
-    public function reviewedBy()
+    public function reviewer()
     {
         return $this->belongsTo(User::class, 'reviewed_by');
     }
 
-    // Helper Methods
+    // Helpers
+    public function isPending(): bool { return $this->status === 'pending'; }
+    public function isApproved(): bool { return $this->status === 'approved'; }
+    public function isRejected(): bool { return $this->status === 'rejected'; }
 
-    /**
-     * Check if payment is approved
-     */
-    public function isApproved(): bool
+    public function hasAdminNote(): bool
     {
-        return $this->status === 'approved';
+        return $this->admin_note !== null && trim($this->admin_note) !== '';
     }
-
-    /**
-     * Check if payment is pending
-     */
-    public function isPending(): bool
-    {
-        return $this->status === 'pending';
-    }
-
-    /**
-     * Check if payment is rejected
-     */
-    public function isRejected(): bool
-    {
-        return $this->status === 'rejected';
-    }
-
-    /**
-     * Check if payment has been reviewed
-     */
-    public function isReviewed(): bool
-    {
-        return $this->reviewed_at !== null;
-    }
-
-    /**
-     * Check if payment has admin note
-     */
-    public function hasNote(): bool
-    {
-        return $this->admin_note !== null;
-    }
-
-    /**
-     * Get the reviewer user
-     */
-    public function reviewer()
-    {
-        return $this->reviewedBy;
-    }
-
 }
-

@@ -17,6 +17,14 @@ use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TicketMessageController;
+use App\Http\Controllers\AdminAnnouncementController;
+use App\Http\Controllers\AnnouncementPublicController;
+use App\Http\Controllers\AdminPostController;
+use App\Http\Controllers\PostPublicController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AdminPaymentController;
+
 
 
 /*
@@ -206,4 +214,64 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/tickets/{ticket}/close', [TicketController::class, 'close'])
         ->name('tickets.close');
+});
+
+// Public (guest allowed)
+Route::get('/announcements', [AnnouncementPublicController::class, 'index'])
+    ->name('announcements.public.index');
+
+Route::get('/announcements/{announcement}', [AnnouncementPublicController::class, 'show'])
+    ->name('announcements.public.show');
+
+// Student panel (auth)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/my/announcements', [AnnouncementPublicController::class, 'my'])
+        ->name('announcements.student.index');
+
+    Route::get('/my/announcements/{announcement}', [AnnouncementPublicController::class, 'myShow'])
+        ->name('announcements.student.show');
+});
+
+// Admin/Teacher (auth + you may have role middleware)
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('announcements', AdminAnnouncementController::class);
+});
+
+// Public blog
+Route::get('/blog', [PostPublicController::class, 'index'])->name('posts.index');
+Route::get('/blog/{post:slug}', [PostPublicController::class, 'show'])->name('posts.show');
+
+// Admin
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('posts', AdminPostController::class);
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])
+        ->name('notifications.index');
+
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])
+        ->name('notifications.read');
+
+    Route::post('/notifications/{notification}/unread', [NotificationController::class, 'markUnread'])
+        ->name('notifications.unread');
+
+    Route::post('/notifications/bulk-read', [NotificationController::class, 'bulkRead'])
+        ->name('notifications.bulkRead');
+});
+
+
+Route::middleware(['auth'])->group(function () {
+
+    // Student
+    Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::get('/enrollments/{enrollment}/payments/create', [PaymentController::class, 'create'])->name('payments.create');
+    Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
+
+    // Admin
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');
+        Route::get('/payments/{payment}', [AdminPaymentController::class, 'show'])->name('payments.show');
+        Route::post('/payments/{payment}/review', [AdminPaymentController::class, 'review'])->name('payments.review');
+    });
 });
