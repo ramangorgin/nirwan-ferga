@@ -45,7 +45,7 @@ class Course extends Model
         'registration_deadline' => 'datetime',
         'start_date' => 'date',
         'end_date' => 'date',
-        'start_time' => 'datetime:H:i'
+        'start_time' => 'string'
     ];
 
     public function teacher()

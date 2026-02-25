@@ -74,13 +74,17 @@ class CourseController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     */
+    */
     public function store(CourseStoreRequest $request)
     {
-
         $this->authorize('create', Course::class);
 
         $data = $request->validated();
+
+        // Keep raw Jalali start_date for time anchoring (if you store start_time in UTC)
+        if (!empty($data['start_date'])) {
+            $data['_jalali_start_date_for_time'] = $data['start_date'];
+        }
 
         if ($request->hasFile('poster')) {
             $data['poster_path'] = $request->file('poster')->store('courses/posters', 'public');
@@ -90,11 +94,17 @@ class CourseController extends Controller
             $data['video_path'] = $request->file('video')->store('courses/videos', 'public');
         }
 
-        $this->courseService->create($data, auth()->id());
+        $tz = (string) (auth()->user()->timezone ?? config('app.timezone', 'UTC'));
+
+        $course = $this->courseService->create(
+            data: $data,
+            creatorUserId: (int) auth()->id(),
+            creatorTimezone: $tz
+        );
 
         return redirect()
             ->route('courses.index')
-            ->with('success', 'Course created successfully.');
+            ->with('success', 'دوره با موفقیت ساخته شد.');
     }
 
     /**
@@ -130,11 +140,16 @@ class CourseController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CourseUpdateRequest $request, Course $course)
+public function update(CourseUpdateRequest $request, Course $course)
     {
         $this->authorize('update', $course);
 
         $data = $request->validated();
+
+        // Keep raw Jalali start_date for time anchoring (if start_time exists or may change)
+        if (!empty($data['start_date'])) {
+            $data['_jalali_start_date_for_time'] = $data['start_date'];
+        }
 
         if ($request->hasFile('poster')) {
             $data['poster_path'] = $request->file('poster')->store('courses/posters', 'public');
@@ -144,11 +159,18 @@ class CourseController extends Controller
             $data['video_path'] = $request->file('video')->store('courses/videos', 'public');
         }
 
-        $this->courseService->update($course, $data, auth()->id());
+        $tz = (string) (auth()->user()->timezone ?? config('app.timezone', 'UTC'));
+
+        $this->courseService->update(
+            course: $course,
+            data: $data,
+            actorUserId: (int) auth()->id(),
+            actorTimezone: $tz
+        );
 
         return redirect()
             ->route('courses.index')
-            ->with('success', 'Course updated successfully.');
+            ->with('success', 'دوره با موفقیت به‌روز شد.');
     }
 
 

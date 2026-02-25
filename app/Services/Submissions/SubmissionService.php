@@ -81,7 +81,7 @@ class SubmissionService
             }
 
             // deadline / late
-            $now = now();
+            $now = now('UTC');
             $deadline = $effective['deadline'];
             $isLate = $deadline ? $now->greaterThan($deadline) : false;
 
@@ -105,7 +105,7 @@ class SubmissionService
 
                 'attempt_number' => $attemptNumber,
                 'status' => $isLate ? 'late_submitted' : 'submitted',
-                'submitted_at' => $now,
+                'submitted_at' => $now('UTC'),
 
                 'auto_graded' => false,
                 'score_obtained' => null,
@@ -160,7 +160,7 @@ class SubmissionService
                 'score_obtained' => $scoreObtained,
                 'feedback_text' => $feedback,
                 'graded_by' => $graderId,
-                'graded_at' => now(),
+                'graded_at' => now('UTC'),
                 'auto_graded' => false,
                 'status' => 'graded',
             ]);
@@ -231,7 +231,7 @@ class SubmissionService
         $submission->update([
             'auto_graded' => true,
             'score_obtained' => $isCorrect ? $max : 0,
-            'graded_at' => now(),
+            'graded_at' => now('UTC'),
             'graded_by' => null,
             'status' => 'graded',
         ]);

@@ -76,15 +76,14 @@ class Enrollment extends Model
     }
 
     /**
-     * Check if payment is pending
+     * Check if status is pending
      */
     public function isPending(): bool
     {
         return $this->status === 'pending';
     }
-
     /**
-     * Check if payment is rejected
+     * Check if status is rejected
      */
     public function isRejected(): bool
     {

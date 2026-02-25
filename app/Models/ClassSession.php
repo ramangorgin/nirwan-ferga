@@ -26,9 +26,10 @@ class ClassSession extends Model
         'has_materials' => 'boolean',
         'session_date' => 'date',
         'session_number' => 'integer',
-        'start_time' => 'datetime:H:i',
-        'end_time' => 'datetime:H:i'
+        'start_time' => 'string',
+        'end_time' => 'string',
     ];
+
 
     public function course()
     {

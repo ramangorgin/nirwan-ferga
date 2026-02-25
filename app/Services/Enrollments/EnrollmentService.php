@@ -51,6 +51,7 @@ class EnrollmentService
                 'student_id' => $studentId,
                 'status' => 'confirmed',
                 'payment_status' => 'paid',
+                'enrolled_at' => now('UTC'),
                 'paid_amount' => $paidAmount ?? $course->price,
             ]);
 
@@ -90,6 +91,9 @@ class EnrollmentService
                 throw ValidationException::withMessages([
                     'status' => 'نمی‌توان ثبت‌نام را تایید کرد مگر اینکه وضعیت پرداخت "پرداخت شده" باشد.'
                 ]);
+            }
+            if (($data['status'] ?? null) === 'confirmed' && $enrollment->enrolled_at === null) {
+                $data['enrolled_at'] = now('UTC');
             }
 
             $enrollment->update($data);

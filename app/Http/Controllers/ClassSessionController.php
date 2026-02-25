@@ -68,7 +68,9 @@ class ClassSessionController extends Controller
         $this->authorize('create', [$course]);
 
         // Create the class session
-        $classSession = ClassSession::create($request->validated());
+        $tz = (string) (auth()->user()->timezone ?? config('app.timezone', 'UTC'));
+        $classSession = $this->classSessionService->store($request->validated(), $tz);
+
 
         return redirect()
             ->route('class-sessions.show', $classSession)
@@ -112,7 +114,9 @@ class ClassSessionController extends Controller
         $this->authorize('update', $classSession);
 
         // Update the class session with validated data
-        $classSession->update($request->validated());
+        $tz = (string) (auth()->user()->timezone ?? config('app.timezone', 'UTC'));
+        $this->classSessionService->update($classSession, $request->validated(), $tz);
+
 
         return redirect()
             ->route('class-sessions.show', $classSession)

@@ -13,7 +13,7 @@ class TicketMessage extends Model
         'ticket_id',
         'sender_id',
         'message',
-        'attachment_path'
+        'attachment_path',
     ];
 
     public function ticket()
@@ -28,44 +28,28 @@ class TicketMessage extends Model
 
     // Helper Methods
 
-    /**
-     * Check if message has attachment
-     */
     public function hasAttachment(): bool
     {
         return $this->attachment_path !== null;
     }
 
-    /**
-     * Check if message is from ticket creator
-     */
     public function isFromTicketCreator(): bool
     {
-        return $this->sender_id === $this->ticket->user_id;
+        return (int) $this->sender_id === (int) ($this->ticket?->user_id);
     }
 
-    /**
-     * Check if message is from ticket assignee
-     */
     public function isFromAssignee(): bool
     {
-        return $this->sender_id === $this->ticket->assigned_to;
+        return (int) $this->sender_id === (int) ($this->ticket?->assigned_to);
     }
 
-    /**
-     * Check if message is from user
-     */
     public function isFromUser(User $user): bool
     {
-        return $this->sender_id === $user->id;
+        return (int) $this->sender_id === (int) $user->id;
     }
 
-    /**
-     * Get time since message was created
-     */
     public function timeSinceCreated(): string
     {
         return $this->created_at->diffForHumans();
     }
-
 }

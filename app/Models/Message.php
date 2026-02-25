@@ -59,7 +59,7 @@ class Message extends Model
         if (!$this->isRead()) {
             $this->update([
                 'is_read' => true,
-                'read_at' => now()
+                'read_at' => now('UTC')
             ]);
         }
     }

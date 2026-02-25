@@ -13,6 +13,10 @@ use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizQuestionController;
 use App\Http\Controllers\StudentQuizController;
+use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\TicketMessageController;
 
 
 /*
@@ -164,4 +168,42 @@ Route::middleware(['auth'])->group(function () {
         Route::get('quizzes/{quiz}/result', [StudentQuizController::class, 'result'])->name('quizzes.result');
     });
 
+});
+
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/conversations', [ConversationController::class, 'index'])
+        ->name('conversations.index');
+
+    Route::post('/conversations', [ConversationController::class, 'store'])
+        ->name('conversations.store');
+
+    Route::get('/conversations/{conversation}', [ConversationController::class, 'show'])
+        ->name('conversations.show');
+
+    Route::post('/conversations/{conversation}/messages', [MessageController::class, 'store'])
+        ->name('conversations.messages.store');
+
+    Route::post('/conversations/{conversation}/read', [MessageController::class, 'markRead'])
+        ->name('conversations.read');
+});
+
+Route::middleware(['auth'])->group(function () {
+
+    // Tickets basic
+    Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets/create', [TicketController::class, 'create'])->name('tickets.create');
+    Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store');
+    Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
+
+    // Messages inside ticket
+    Route::post('/tickets/{ticket}/messages', [TicketMessageController::class, 'store'])
+        ->name('tickets.messages.store');
+
+    // Admin update + close
+    Route::patch('/tickets/{ticket}/admin-update', [TicketController::class, 'adminUpdate'])
+        ->name('tickets.adminUpdate');
+
+    Route::post('/tickets/{ticket}/close', [TicketController::class, 'close'])
+        ->name('tickets.close');
 });

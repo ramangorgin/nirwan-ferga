@@ -32,7 +32,7 @@ class Conversation extends Model
 
     public function messages()
     {
-        return $this->hasMany(Message::class);
+        return $this->hasMany(Message::class)->orderBy('created_at');
     }
 
     // Helper Methods
@@ -103,7 +103,7 @@ class Conversation extends Model
             ->where('sender_id', '!=', $user->id)
             ->update([
                 'is_read' => true,
-                'read_at' => now()
+                'read_at' => now('UTC'),
             ]);
     }
 

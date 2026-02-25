@@ -9,16 +9,23 @@ use App\Services\Notifications\NotificationService;
 use App\Services\Sms\SmsService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use App\Services\DateTime\DateTimeService;
 
 class AssignmentService
 {
     public function __construct(
         protected NotificationService $notificationService,
-        protected SmsService $smsService
+        protected SmsService $smsService,
+        protected DateTimeService $dateTimeService,
     ) {}
 
     public function store(array $data, int $actorUserId): Assignment
     {
+        $tz = (string) (auth()->user()->timezone ?? config('app.timezone', 'UTC'));
+
+        if (!empty($data['deadline'])) {
+            $data['deadline'] = $this->dateTimeService->jalaliToUtc($data['deadline'], $tz);
+        }
         return DB::transaction(function () use ($data, $actorUserId) {
             $assignment = Assignment::create([
                 'session_id' => $data['session_id'],
@@ -43,13 +50,17 @@ class AssignmentService
 
     public function update(Assignment $assignment, array $data, int $actorUserId): Assignment
     {
+        $tz = (string) (auth()->user()->timezone ?? config('app.timezone', 'UTC'));
+
+        if (array_key_exists('deadline', $data) && !empty($data['deadline'])) {
+            $data['deadline'] = $this->dateTimeService->jalaliToUtc($data['deadline'], $tz);
+        }
         return DB::transaction(function () use ($assignment, $data, $actorUserId) {
             $wasPublished = $assignment->status === 'published';
 
             $assignment->fill($data);
             $assignment->save();
 
-            // اگر تازه published شد، نوتیفیکیشن بده
             $isPublishedNow = $assignment->status === 'published';
             if (!$wasPublished && $isPublishedNow) {
                 $this->notifyPublished($assignment, $actorUserId);
@@ -106,6 +117,13 @@ class AssignmentService
             }
 
             foreach ($personalizations as $studentId => $row) {
+                $tz = (string) (auth()->user()->timezone ?? config('app.timezone', 'UTC'));
+
+                $customDeadlineUtc = null;
+                if (!empty($row['custom_deadline'])) {
+                    $customDeadlineUtc = $this->dateTimeService->jalaliToUtc($row['custom_deadline'], $tz);
+                }
+
                 AssignmentPersonalization::updateOrCreate(
                     [
                         'assignment_id' => $assignment->id,
