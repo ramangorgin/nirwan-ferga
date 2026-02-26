@@ -21,6 +21,8 @@ $tones = [
         <div class="mt-1 text-sm text-ui-muted leading-7">{{ $text }}</div>
       @endif
     </div>
-    <button class="h-9 w-9 rounded-xl bg-ui-bg hover:bg-ui-border/40"></button>
+    <button class="h-9 w-9 rounded-xl bg-ui-bg hover:bg-ui-border/40 flex items-center justify-center text-ui-text hover:text-ui-text">
+      <x-ui.icon name="x" class="h-5 w-5" />
+    </button>
   </div>
 </div>

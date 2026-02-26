@@ -10,7 +10,9 @@
     <div class="absolute inset-y-0 right-0 w-full max-w-md bg-ui-surface border-l border-ui-border shadow-soft">
       <div class="p-4 border-b border-ui-border flex items-center justify-between">
         <div class="text-lg font-extrabold">{{ $title }}</div>
-        <button class="h-10 w-10 rounded-xl hover:bg-ui-bg"></button>
+        <button class="h-10 w-10 rounded-xl hover:bg-ui-bg flex items-center justify-center text-ui-text hover:text-ui-text">
+          <x-ui.icon name="x" class="h-5 w-5" />
+        </button>
       </div>
 
       <div class="p-6 overflow-y-auto max-h-[calc(100vh-160px)]">

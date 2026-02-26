@@ -10,7 +10,9 @@
   </div>
 
   <div class="flex items-center gap-2">
-    <button type="button" class="h-10 w-10 rounded-xl border border-ui-border bg-ui-surface hover:bg-ui-bg">‹</button>
+    <button type="button" class="h-10 w-10 rounded-xl border border-ui-border bg-ui-surface hover:bg-ui-bg flex items-center justify-center text-ui-text">
+      <x-ui.icon name="chevron-left" class="h-5 w-5" />
+    </button>
 
     @for($i=1; $i<=$total; $i++)
       <button type="button"
@@ -20,6 +22,8 @@
       </button>
     @endfor
 
-    <button type="button" class="h-10 w-10 rounded-xl border border-ui-border bg-ui-surface hover:bg-ui-bg">›</button>
+    <button type="button" class="h-10 w-10 rounded-xl border border-ui-border bg-ui-surface hover:bg-ui-bg flex items-center justify-center text-ui-text">
+      <x-ui.icon name="chevron-right" class="h-5 w-5" />
+    </button>
   </div>
 </div>
