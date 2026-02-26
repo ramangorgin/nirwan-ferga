@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================
+   Design Tokens (CSS Vars)
+   ========================= */
+:root {
+  /* Brand */
+  --c-primary: 245 158 11;        /* #F59E0B */
+  --c-primary-hover: 217 119 6;   /* #D97706 */
+  --c-secondary: 37 99 235;       /* #2563EB */
+  --c-secondary-hover: 29 78 216; /* #1D4ED8 */
+  --c-success: 34 197 94;         /* #22C55E */
+
+  /* UI (Light) */
+  --c-bg: 248 250 252;            /* #F8FAFC */
+  --c-surface: 255 255 255;       /* #FFFFFF */
+  --c-border: 226 232 240;        /* #E2E8F0 */
+  --c-text: 30 41 59;             /* #1E293B */
+  --c-text-muted: 51 65 85;       /* #334155 */
+}
+
+.dark {
+  /* UI (Dark) */
+  --c-bg: 15 23 42;               /* #0F172A */
+  --c-surface: 30 41 59;          /* #1E293B */
+  --c-border: 51 65 85;           /* #334155 */
+  --c-text: 226 232 240;          /* #E2E8F0 */
+  --c-text-muted: 203 213 225;    /* close to slate-300 */
+}
+
+/* =========================
+   Fonts (served from /public)
+   ========================= */
+
+/* Kurdish (Sorani) */
+@font-face {
+  font-family: "KurdishUI";
+  src:
+    url("/fonts/ku-72_Sarchia_Qaisy/72_Sarchia_Qaisy.woff") format("woff"),
+    url("/fonts/ku-72_Sarchia_Qaisy/72_Sarchia_Qaisy.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Persian - Peyda (ALL weights) */
+@font-face { font-family:"PersianUI"; src:url("/fonts/fa-peyda/Peyda-Thin.ttf") format("truetype"); font-weight:100; font-style:normal; font-display:swap; }
+@font-face { font-family:"PersianUI"; src:url("/fonts/fa-peyda/Peyda-ExtraLight.ttf") format("truetype"); font-weight:200; font-style:normal; font-display:swap; }
+@font-face { font-family:"PersianUI"; src:url("/fonts/fa-peyda/Peyda-Light.ttf") format("truetype"); font-weight:300; font-style:normal; font-display:swap; }
+@font-face { font-family:"PersianUI"; src:url("/fonts/fa-peyda/Peyda-Regular.ttf") format("truetype"); font-weight:400; font-style:normal; font-display:swap; }
+@font-face { font-family:"PersianUI"; src:url("/fonts/fa-peyda/Peyda-Medium.ttf") format("truetype"); font-weight:500; font-style:normal; font-display:swap; }
+@font-face { font-family:"PersianUI"; src:url("/fonts/fa-peyda/Peyda-SemiBold.ttf") format("truetype"); font-weight:600; font-style:normal; font-display:swap; }
+@font-face { font-family:"PersianUI"; src:url("/fonts/fa-peyda/Peyda-Bold.ttf") format("truetype"); font-weight:700; font-style:normal; font-display:swap; }
+@font-face { font-family:"PersianUI"; src:url("/fonts/fa-peyda/Peyda-ExtraBold.ttf") format("truetype"); font-weight:800; font-style:normal; font-display:swap; }
+@font-face { font-family:"PersianUI"; src:url("/fonts/fa-peyda/Peyda-Black.ttf") format("truetype"); font-weight:900; font-style:normal; font-display:swap; }
+
+/* =========================
+   Base defaults
+   ========================= */
+html { direction: rtl; }
+body {
+  font-family: "PersianUI", sans-serif;
+  background: rgb(var(--c-bg));
+  color: rgb(var(--c-text));
+}

@@ -79,6 +79,11 @@ This project focuses on reaching production fast while keeping the codebase stru
 
 ---
 
+## Docs
+
+### UI Kit docs:
+docs/ui/README.md
+
 ## Installation
 
 ### Requirements
