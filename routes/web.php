@@ -42,6 +42,8 @@ use App\Http\Controllers\AdminUserController;
 
 use App\Http\Controllers\Auth\PasswordResetController;
 
+use App\Http\Controllers\DashboardController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -54,6 +56,9 @@ Route::get('/ui/js-test', fn() => view('ui.js-test'));
 Route::get('/', function () {
     return view('home');
 })->name('home');
+
+Route::view('/about', 'about')->name('about');
+Route::view('/contact', 'contact')->name('contact');
 
 /*
 |--------------------------------------------------------------------------
@@ -97,12 +102,32 @@ Route::middleware('guest')->group(function () {
         ->name('password.update');
 });
 
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated Routes
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
+
+    Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::get('/admin/dashboard', function () {
+        abort_unless(auth()->user()?->role === 'admin', 403);
+
+        return view('admin.dashboard.index');
+    })->name('admin.dashboard');
+
+    Route::get('/teacher/dashboard', function () {
+        abort_unless(auth()->user()?->role === 'teacher', 403);
+
+        return view('teacher.dashboard.index');
+    })->name('teacher.dashboard');
+
+    Route::get('/student/dashboard', function () {
+        abort_unless(auth()->user()?->role === 'student', 403);
+
+        return view('student.dashboard.index');
+    })->name('student.dashboard');
 
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 

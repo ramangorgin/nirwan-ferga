@@ -26,8 +26,15 @@ class UserService
                 'phone' => $data['phone'] ?? null,
                 'password' => $data['password'], // hashed via mutator
                 'role' => 'student',
-                'timezone' => $data['timezone'] ?? 'UTC',
                 'status' => 'pending',
+
+                'gender' => $data['gender'] ?? null,
+                'birthdate' => !empty($data['birthdate'])
+                    ? $this->dateTimeService->jalaliDateToGregorian($data['birthdate'])
+                    : null,
+                'country' => $data['country'] ?? null,
+                'city' => $data['city'] ?? null,
+                'timezone' => $data['timezone'] ?? 'Asia/Tehran',
             ]);
         });
     }

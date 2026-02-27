@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
 @section('page_title', 'UI Playground')
-@section('page_subtitle', 'کیت رابط کاربری نێروان فێرگە — نسخه اولیه')
+@section('page_subtitle', 'کیت رابط کاربری نیروان فێرگە — نسخه اولیه')
 
 @section('dashboard_content')
 <div class="space-y-8">

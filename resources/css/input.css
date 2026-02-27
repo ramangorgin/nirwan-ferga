@@ -56,12 +56,41 @@
 @font-face { font-family:"PersianUI"; src:url("/fonts/fa-peyda/Peyda-ExtraBold.ttf") format("truetype"); font-weight:800; font-style:normal; font-display:swap; }
 @font-face { font-family:"PersianUI"; src:url("/fonts/fa-peyda/Peyda-Black.ttf") format("truetype"); font-weight:900; font-style:normal; font-display:swap; }
 
+/* Persian - YekanBakh variants */
+@font-face {
+  font-family: "PersianYekanA";
+  src: url("/fonts/fa-yekanbakh/YekanBakh.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PersianYekanB";
+  src: url("/fonts/fa-yekanbakh/Yekan%20Bakh%20Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* =========================
    Base defaults
    ========================= */
 html { direction: rtl; }
 body {
-  font-family: "PersianUI", sans-serif;
+  font-family: "PersianYekanA", "PersianUI", sans-serif;
   background: rgb(var(--c-bg));
   color: rgb(var(--c-text));
+}
+
+.font-fa {
+  font-family: "PersianYekanA", "PersianUI", sans-serif;
+}
+
+.font-fa-2 {
+  font-family: "PersianYekanB", "PersianUI", sans-serif;
+}
+
+.font-ku {
+  font-family: "KurdishUI", sans-serif;
 }

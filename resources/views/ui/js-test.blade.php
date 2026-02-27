@@ -7,7 +7,7 @@
 
   <div class="flex items-center justify-between">
     <h1 class="text-2xl font-extrabold">تست کتابخانه‌های جاوااسکریپت</h1>
-    <div class="text-sm text-ui-muted">نێروان فێرگە</div>
+    <div class="text-sm text-ui-muted">نیروان فێرگە</div>
   </div>
 
   {{-- Toastr --}}

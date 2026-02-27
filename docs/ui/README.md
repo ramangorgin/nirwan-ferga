@@ -2,7 +2,7 @@
 
 This UI Kit is a Blade Components design system for the Nirwan-ferga project.
 The public-facing UI language is Persian (RTL), while Kurdish Sorani is used in learning content.
-Brand display name in UI must be Kurdish: **نێروان فێرگە**
+Brand display name in UI must be Kurdish: **نیروان فێرگە**
 Code/repo/domain name: **Nirwan-ferga**
 
 ## Goals

@@ -9,7 +9,7 @@
       <div class="flex items-center gap-3">
         <img class="h-10 w-10 rounded-xl" src="{{ asset('images/brand/logo.png') }}" alt="logo">
         <div>
-          <div class="font-bold text-ui-text">{{ env('APP_BRAND_DISPLAY', 'نێروان فێرگە') }}</div>
+          <div class="font-ku font-bold text-ui-text">{{ env('APP_BRAND_DISPLAY', 'نیروان فێرگە') }}</div>
           <div class="text-sm text-ui-muted">پنل مدیریت</div>
         </div>
       </div>
