@@ -49,6 +49,7 @@ use App\Http\Controllers\Auth\PasswordResetController;
 */
 
 Route::get('/ui', fn() => view('ui.playground'));
+Route::get('/ui/js-test', fn() => view('ui.js-test'));
 
 Route::get('/', function () {
     return view('home');

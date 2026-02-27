@@ -76,8 +76,6 @@
     if (href) window.location.href = href;
   });
 
-
-
   // ---------- Jalali Datepicker ----------
   window.uiInitJalaliDatepicker = function () {
     try {

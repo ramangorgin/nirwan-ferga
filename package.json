@@ -6,8 +6,9 @@
         "build": "vite build",
         "dev": "vite",
         "tw:watch": "tailwindcss -i ./resources/css/input.css -o ./public/assets/app.css --watch",
-        "tw:build": "tailwindcss -i ./resources/css/input.css -o ./public/assets/app.css --minify"
-
+        "tw:build": "tailwindcss -i ./resources/css/input.css -o ./public/assets/app.css --minify",
+        "js:copy": "node -e \"require('fs').copyFileSync('resources/js/app.js','public/assets/app.js')\"",
+        "vendor:copy": "node scripts/copy-vendors.cjs"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",
@@ -18,5 +19,14 @@
         "postcss": "^8.5.6",
         "tailwindcss": "^3.4.19",
         "vite": "^7.0.7"
+    },
+    "dependencies": {
+        "@ckeditor/ckeditor5-build-classic": "^38.1.1",
+        "@majidh1/jalalidatepicker": "^0.9.12",
+        "alpinejs": "^3.15.8",
+        "animate.css": "^4.1.1",
+        "jquery": "^4.0.0",
+        "sweetalert2": "^11.26.20",
+        "toastr": "^2.1.4"
     }
 }
